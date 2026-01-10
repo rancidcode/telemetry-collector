@@ -19,6 +19,11 @@ mqtt:
   username: ${MQTT_USERNAME}
   password: ${MQTT_PASSWORD}
 
+kafka:
+  topic:
+    raw: ${KAFKA_TOPIC_RAW}
+    dlq: ${KAFKA_TOPIC_DLQ}
+
 logging:
   level:
     org.apache.kafka: OFF

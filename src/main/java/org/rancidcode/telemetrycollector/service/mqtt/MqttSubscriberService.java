@@ -27,9 +27,6 @@ public class MqttSubscriberService {
     final Mqtt5AsyncClient mqttClient;
     final KafkaProducerService kafkaProducer;
 
-    final String rawTopic = "telemetry.raw";
-    final String dlqTopic = "telemetry.dlq";
-
     @Value("${mqtt.topic}")
     String topic;
 
@@ -38,6 +35,12 @@ public class MqttSubscriberService {
 
     @Value("${mqtt.password}")
     String password;
+
+    @Value("${kafka.topic.raw}")
+    String rawTopic;
+
+    @Value("${kafka.topic.dlq}")
+    String dlqTopic;
 
     @PostConstruct
     public void init() {
@@ -72,6 +75,7 @@ public class MqttSubscriberService {
 
     private void messageValidation(Mqtt5Publish publish) {
         String message = new String(publish.getPayloadAsBytes(), StandardCharsets.UTF_8);
+       
         try {
             JSONObject jsonObject = new JSONObject(message);
 
@@ -81,7 +85,7 @@ public class MqttSubscriberService {
             JSONObject dlq = new JSONObject();
             getDlq(dlq, e, message);
 
-            kafkaProducer.send(rawTopic, dlq.toString());
+            kafkaProducer.send(dlqTopic, dlq.toString());
             log.info("Topic: {}, Sent message: {}", dlqTopic, dlq);
         } catch (Exception e) {
             throw new RuntimeException(e);
