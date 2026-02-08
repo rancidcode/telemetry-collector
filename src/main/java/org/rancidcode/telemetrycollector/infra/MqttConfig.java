@@ -1,4 +1,4 @@
-package org.rancidcode.telemetrycollector.config;
+package org.rancidcode.telemetrycollector.infra;
 
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
