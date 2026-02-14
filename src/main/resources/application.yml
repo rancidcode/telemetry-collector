@@ -27,3 +27,15 @@ kafka:
 logging:
   level:
     org.apache.kafka: OFF
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health"
+  endpoint:
+    health:
+      show-details: always
+
+webhook:
+  url: ${WEBHOOK_URL}

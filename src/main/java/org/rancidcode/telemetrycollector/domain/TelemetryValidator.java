@@ -36,7 +36,7 @@ public class TelemetryValidator {
         dlq.put("source", "MQTT");
         dlq.put("rawMessage", message);
         dlq.put("errorMessage", e.getMessage());
-        
+
 
         return dlq;
     }

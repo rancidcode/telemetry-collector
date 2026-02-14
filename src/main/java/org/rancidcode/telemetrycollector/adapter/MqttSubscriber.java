@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.rancidcode.telemetrycollector.infra.MqttStatusPublisher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ public class MqttSubscriber {
 
     final Mqtt5AsyncClient mqttClient;
     final KafkaProducer kafkaProducer;
+    final MqttStatusPublisher mqttStatusPublisher;
 
     @Value("${mqtt.topic}")
     String topic;
@@ -30,6 +32,9 @@ public class MqttSubscriber {
 
     @Value("${mqtt.password}")
     String password;
+
+    @Value("${webhook.url}")
+    String webhookUrl;
 
     @PostConstruct
     public void init() {
@@ -41,8 +46,10 @@ public class MqttSubscriber {
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         log.error("MQTT connection failed : {}", throwable.getMessage());
+                        mqttStatusPublisher.publishMqttStatus(webhookUrl, "DISCONNECTED");
                     } else {
                         log.info("MQTT subscriber connected");
+                        mqttStatusPublisher.publishMqttStatus(webhookUrl, "CONNECTED");
                         subscribeToTopic();
                     }
                 });
@@ -63,8 +70,7 @@ public class MqttSubscriber {
     }
 
     private void produce(Mqtt5Publish publish) {
-       String message = new String(publish.getPayloadAsBytes(), StandardCharsets.UTF_8);
-       message="fgfgfgfg";
-       kafkaProducer.processRawMessage(message);
+        String message = new String(publish.getPayloadAsBytes(), StandardCharsets.UTF_8);
+        kafkaProducer.processRawMessage(message);
     }
 }
